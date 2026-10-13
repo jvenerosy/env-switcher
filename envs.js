@@ -51,6 +51,63 @@ export function onEnvsChanged(callback) {
   });
 }
 
+// Environment types: only the first part of the host (ap2, dev1, preprod, staging)
+// comes from the type; the rest of the host is prefilled with a default suffix
+// and can be edited freely in the URL field.
+//   ap2     -> https://ap2.www.apps.ocp-1.pin.prd.mlb.nbyt.fr
+//   dev1    -> https://dev1.www.apps.ocp-1.pin.prd.mlb.nbyt.fr
+//   preprod -> https://preprod.www.apps.ocp-3.ocp.euw3r53.nbyt.fr
+// "autre" keeps a free URL.
+export const ENV_TYPES = {
+  ap:      { label: "ap",      number: "required", suffix: "www.apps.ocp-1.pin.prd.mlb.nbyt.fr" },
+  dev:     { label: "dev",     number: "optional", suffix: "www.apps.ocp-1.pin.prd.mlb.nbyt.fr" },
+  preprod: { label: "preprod", number: "none",     suffix: "www.apps.ocp-3.ocp.euw3r53.nbyt.fr" },
+  staging: { label: "staging", number: "none",     suffix: "www.apps.ocp-3.ocp.euw3r53.nbyt.fr" },
+  autre:   { label: "Autre (URL libre)" },
+};
+
+export function envPrefix({ type, num }) {
+  const t = ENV_TYPES[type];
+  if (!t?.suffix) return "";
+  return type + (t.number === "none" ? "" : String(num ?? "").trim());
+}
+
+// Splits an origin into { prefix, suffix } at the first dot of the host.
+export function splitHost(url) {
+  try {
+    const u = new URL(url);
+    const i = u.host.indexOf(".");
+    return i < 0 ? { scheme: u.protocol, prefix: u.host, suffix: "" }
+      : { scheme: u.protocol, prefix: u.host.slice(0, i), suffix: u.host.slice(i + 1) };
+  } catch {
+    return null;
+  }
+}
+
+// Builds the URL for a typed env, keeping the current suffix (or the type's default).
+export function buildEnvUrl(env, currentUrl = env.url) {
+  const t = ENV_TYPES[env.type];
+  if (!t?.suffix) return null;
+  const parts = currentUrl ? splitHost(currentUrl) : null;
+  const suffix = parts?.suffix || t.suffix;
+  return `${parts?.scheme || "https:"}//${envPrefix(env)}.${suffix}`;
+}
+
+// Reachability check: any HTTP response (even opaque/no-cors) means the server
+// is up; a network error (DNS, refused, TLS) or timeout means it is down.
+export async function checkStatus(url, timeout = 5000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeout);
+  try {
+    await fetch(url, { method: "HEAD", mode: "no-cors", cache: "no-store", credentials: "omit", signal: ctrl.signal });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // Matches on host (hostname + port), so http/https variants of the same env are recognised.
 export function findEnv(envs, pageUrl) {
   let host;

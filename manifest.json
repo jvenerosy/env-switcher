@@ -3,7 +3,7 @@
   "name": "Env Switcher",
   "version": "1.1.1",
   "description": "Passe d'un environnement à un autre (prod, preprod, recette…) en gardant la même page.",
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "tabs", "alarms", "notifications"],
   "background": {
     "service_worker": "background.js",
     "type": "module"

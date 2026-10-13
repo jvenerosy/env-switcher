@@ -91,6 +91,38 @@ header {
   border-radius: 999px;
   padding: 0 6px;
 }
+.env .status {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #eab308;
+}
+.env .status.is-up { background: #16a34a; }
+.env .status.is-down { background: #dc2626; }
+/* Instant label on hover: "en ligne", "hors ligne", "vérification…" */
+.env .status { position: relative; }
+.env .status::before { content: ""; position: absolute; inset: -6px; } /* larger hover target */
+.env .status::after {
+  content: attr(data-label);
+  position: absolute;
+  right: -4px;
+  bottom: calc(100% + 6px);
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #fff;
+  background: #6b7280;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .12s;
+  z-index: 1;
+}
+.env .status.is-up::after { background: #16a34a; }
+.env .status.is-down::after { background: #dc2626; }
+.env .status:hover::after { opacity: 1; }
 .newtab {
   border: 0;
   background: none;

@@ -23,7 +23,7 @@
         <span role="columnheader">Couleur</span>
         <span role="columnheader">Nom</span>
         <span role="columnheader">Badge</span>
-        <span role="columnheader">URL / hostname</span>
+        <span role="columnheader">Type · URL</span>
         <span></span>
       </div>
       <div id="rows"></div>
@@ -61,7 +61,11 @@
       <input type="color" class="f-color" aria-label="Couleur">
       <input type="text" class="f-name" placeholder="Recette 1" aria-label="Nom">
       <input type="text" class="f-short" placeholder="R1" maxlength="4" aria-label="Badge (4 caractères max)">
-      <input type="text" class="f-url" placeholder="https://recette1.exemple.fr" aria-label="URL ou hostname" spellcheck="false">
+      <span class="url-cell">
+        <select class="f-type" aria-label="Type"></select>
+        <input type="text" class="f-num" placeholder="n°" inputmode="numeric" aria-label="Numéro" spellcheck="false">
+        <input type="text" class="f-url" placeholder="https://recette1.exemple.fr" aria-label="URL ou hostname" spellcheck="false">
+      </span>
       <span class="row-actions">
         <button type="button" class="up" title="Monter">↑</button>
         <button type="button" class="down" title="Descendre">↓</button>
